@@ -1,0 +1,178 @@
+# 双仓部署流水线：内容仓推送 -> 本仓库重新构建 -> 部署到 Cloudflare Pages。
+#
+# 触发来源：
+#   1. 本仓库 main 分支的代码变更；
+#   2. 内容仓（jiuxinya/aetheris-content）推送后由 trigger-build.yml 发来的 content-updated 事件；
+#   3. 手动 workflow_dispatch —— 回滚时把 content_ref 填成历史内容 commit 即可重发旧版；
+#   4. 每日兜底重建（repository_dispatch 偶尔会丢事件）。
+#
+# 本仓库需要的 Secrets（Settings > Secrets and variables > Actions）：
+#   CONTENT_REPO_TOKEN     读取私有内容仓
+#   CLOUDFLARE_API_TOKEN   部署到 Cloudflare Pages
+#   CLOUDFLARE_ACCOUNT_ID  Cloudflare 账号 ID
+# 内容仓侧另需 DISPATCH_TOKEN（对本仓库有 contents:write 权限）。
+#
+# 注意：Pages 项目 jiuxinya-blog 是 Direct Upload 类型，所以这里用 wrangler 直传产物，
+# 而不是依赖 Pages 自带的 Git 集成构建——这样无需改动已经跑通的自定义域配置。
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "rules/**"
+      - "README*.md"
+      - "*.md"
+  # 内容仓推送后由 trigger-build.yml 发来的事件。
+  repository_dispatch:
+    types: [content-updated]
+  # 手动触发；回滚时把 content_ref 填成旧的内容 SHA。
+  workflow_dispatch:
+    inputs:
+      content_ref:
+        description: "内容仓 ref 或 commit SHA（留空使用 main）"
+        required: false
+        default: ""
+  # 兜底：repository_dispatch 事件偶尔会丢，每天重建一次保证最终一致。
+  schedule:
+    - cron: "17 4 * * *"
+
+# 并发控制：同一时间只允许一个部署流水线运行。
+# 代码推送与内容触发归入同一个 deploy 并发通道，新请求自动取消正在运行的旧构建，
+# 确保始终以最新一次提交（最新代码 + 最新内容）为准。
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CONTENT_REPOSITORY: jiuxinya/aetheris-content
+  CONTENT_WORKING_COPY: .content-src
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+      # 让 content:sync 走「本地目录」模式，内容由下面的 checkout 步骤取得。
+      CONTENT_DIR: .content-src
+
+    steps:
+      - name: Resolve content ref
+        id: target
+        # 经 env 传递而不是直接内插到脚本里：client_payload 属于外部输入，
+        # 直接内插会形成 shell 注入面。
+        env:
+          PAYLOAD_SHA: ${{ github.event.client_payload.sha }}
+          INPUT_REF: ${{ github.event.inputs.content_ref }}
+        run: |
+          set -euo pipefail
+          ref="${PAYLOAD_SHA:-}"
+          [ -n "$ref" ] || ref="${INPUT_REF:-}"
+          [ -n "$ref" ] || ref="main"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout theme
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Checkout content
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ${{ env.CONTENT_REPOSITORY }}
+          ref: ${{ steps.target.outputs.ref }}
+          path: ${{ env.CONTENT_WORKING_COPY }}
+          token: ${{ secrets.CONTENT_REPO_TOKEN }}
+          persist-credentials: false
+
+      - name: Record content commit
+        id: content
+        run: |
+          set -euo pipefail
+          echo "sha=$(git -C '${{ env.CONTENT_WORKING_COPY }}' rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.14.4
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Restore build caches
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          # 缩略图按源图内容哈希复用，跨 commit 的缓存命中安全且有效。
+          path: |
+            public/assets/moments/thumbnails
+          key: ${{ runner.os }}-shirone-thumbnails-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-shirone-thumbnails-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      # 独立成步，而不是依赖 `pnpm build` 内部再跑一次：
+      # 内容问题与构建问题因此在日志里天然分开。
+      - name: Materialize content and config
+        run: pnpm content:sync
+
+      - name: Restore anime cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            src/data/anime-snapshots
+            public/assets/anime/covers
+          key: ${{ runner.os }}-shirone-anime-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-shirone-anime-
+
+      - name: Sync anime data (best effort)
+        run: pnpm anime:sync --if-stale
+        env:
+          BILI_SESSDATA: ${{ secrets.BILI_SESSDATA }}
+
+      - name: Build site
+        run: pnpm build
+
+      - name: Deploy to Cloudflare Pages
+        # --branch=main 对应 Pages 项目的生产分支。
+        run: npx -y wrangler@latest pages deploy dist --project-name=jiuxinya-blog --branch=main --commit-dirty=true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Node 在部分环境默认 IPv6 优先，而到 Cloudflare 的 IPv6 路径会静默丢包，
+          # 表现为卡满 5 分钟后 fetch failed（undici 默认 headersTimeout）。
+          NODE_OPTIONS: --dns-result-order=ipv4first
+
+      - name: Summarize
+        if: always()
+        run: |
+          set -euo pipefail
+          {
+            echo "### Shirone deploy"
+            echo ""
+            echo "- 内容仓：\`${CONTENT_REPOSITORY}\`"
+            echo "- 内容 ref：\`${{ steps.target.outputs.ref }}\`"
+            echo "- 内容 commit：\`${{ steps.content.outputs.sha }}\`"
+            if [ -f content.lock.json ]; then
+              echo ""
+              echo "<details><summary>content.lock.json</summary>"
+              echo ""
+              echo '```json'
+              cat content.lock.json
+              echo '```'
+              echo ""
+              echo "</details>"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
