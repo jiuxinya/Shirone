@@ -10,6 +10,12 @@ dist/
 content.lock.json
 Shirone-Content/
 
+# content mounted from the content repository (blog/ -> src/content/posts)
+src/content/posts/
+
+# theme demo content kept locally for syntax reference only
+demo-content/
+
 # generated types
 .astro/
 

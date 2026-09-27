@@ -1,0 +1,21 @@
+{
+	"schemaVersion": 1,
+
+	"source": {
+		"type": "git",
+		"url": "https://github.com/jiuxinya/aetheris-content.git",
+		"ref": "main"
+	},
+
+	"mounts": {
+		"content": false,
+		"data": false,
+		"assets": false,
+		"public": false,
+		"blog": "src/content/posts"
+	},
+
+	"keep": [],
+
+	"prune": true
+}
