@@ -115,3 +115,7 @@ jobs:
 
       - name: Build production site
         run: pnpm build
+        env:
+          # 内容已分离到私有内容仓 jiuxinya/aetheris-content，CI 同样需要凭据才能物化内容；
+          # 这个 URL 会被 content:sync 的 redactUrl 自动脱敏，不会出现在日志里。
+          CONTENT_REPO_URL: https://x-access-token:${{ secrets.CONTENT_REPO_TOKEN }}@github.com/jiuxinya/aetheris-content.git
