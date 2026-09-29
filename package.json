@@ -33,6 +33,7 @@
     "content:clean": "node scripts/content/clean.mjs",
     "content:watch": "node scripts/content/sync.mjs --watch",
     "content:validate": "node scripts/content/sync.mjs --dry-run",
+    "content:check-assets": "node scripts/content/check-asset-refs.mjs",
     "content:eject": "node scripts/content/eject.mjs",
     "content:export": "node scripts/content/export.mjs",
     "design:lint": "node scripts/check-design.mjs",

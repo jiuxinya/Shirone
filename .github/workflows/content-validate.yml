@@ -101,6 +101,15 @@ jobs:
           node scripts/icons/generate-local-icons.mjs
           pnpm exec astro sync
 
+      # 第三关：Markdown 里的相对图片引用必须指向真实文件。
+      # Obsidian 默认的 shortest 链接格式在文件名唯一时只写裸文件名，
+      # 缺 attachments/ 前缀的引用只会在 astro build 阶段以 ImageNotFound 失败。
+      - name: Validate image references
+        working-directory: theme
+        env:
+          CONTENT_DIR: ${{ github.workspace }}/content
+        run: pnpm content:check-assets
+
       - name: Summarize
         if: always()
         working-directory: theme
