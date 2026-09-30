@@ -58,7 +58,7 @@ const filteredItems = $derived(
 <Card color="var(--card-bg)" radius="l" class="timeline-section px-8 py-6">
 	<!-- 页面大标题 -->
 	<PageHeader
-		icon="material-symbols:timeline-rounded"
+		icon="material-symbols:timeline"
 		{title}
 		{subtitle}
 	/>

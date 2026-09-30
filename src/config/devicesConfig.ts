@@ -12,33 +12,40 @@ import { withUserConfig } from "../utils/config-overlay.ts";
  * 注：设备的具体清单数据（设备名、品牌、规格、感受说明、图片等）请在 `src/data/devices.ts` 中维护。
  */
 export const devicesConfig: DevicesConfig = withUserConfig("devices", {
-	enable: false,
+	enable: true,
 	title: "$t:devices",
-	description: "$t:devicesBanner",
+	description:
+		"一套 24 小时运行的家庭实验室：主力终端、常驻服务器、边界网络、云主机与供电设备。",
 	categories: [
 		{
-			key: "desk",
-			label: "Desk Setup",
+			key: "workstation",
+			label: "主力终端",
 			icon: "material-symbols:desktop-windows-outline-rounded",
-			description: "Workstation & home office hardware",
+			description: "日常使用的工作终端与调度中枢",
 		},
 		{
-			key: "mobile",
-			label: "Mobile & EDC",
-			icon: "material-symbols:phone-iphone",
-			description: "Daily portable devices & smart gadgets",
+			key: "server",
+			label: "常驻服务",
+			icon: "material-symbols:storage-rounded",
+			description: "7×24 运行的自托管与计算主机",
 		},
 		{
-			key: "audio",
-			label: "Audio & Visual",
-			icon: "material-symbols:headphones-rounded",
-			description: "Headphones, speakers & monitoring gears",
+			key: "network",
+			label: "网络设备",
+			icon: "material-symbols:router-outline-rounded",
+			description: "边界路由与无线接入",
 		},
 		{
-			key: "peripheral",
-			label: "Peripherals",
-			icon: "material-symbols:keyboard-outline-rounded",
-			description: "Keyboards, mice & desk accessories",
+			key: "cloud",
+			label: "云主机",
+			icon: "material-symbols:computer-rounded",
+			description: "对外服务承载与隧道中转",
+		},
+		{
+			key: "iot",
+			label: "IoT 与供电",
+			icon: "material-symbols:electrical-services-rounded",
+			description: "供电保障与带屏物联设备",
 		},
 	],
 	// disabledIds: [],

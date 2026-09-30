@@ -71,13 +71,13 @@ export const LinkPresets: Record<string, NavBarLink> = {
 	Skills: {
 		name: i18n(I18nKey.skills),
 		url: "/skills/",
-		icon: "material-symbols:workspaces-outline-rounded",
+		icon: "material-symbols:settings-suggest-rounded",
 		pageKey: "skills",
 	},
 	Projects: {
 		name: i18n(I18nKey.projects),
 		url: "/projects/",
-		icon: "material-symbols:deployed-code-outline-rounded",
+		icon: "material-symbols:terminal-rounded",
 		pageKey: "projects",
 	},
 	Devices: {
@@ -95,7 +95,7 @@ export const LinkPresets: Record<string, NavBarLink> = {
 	Timeline: {
 		name: i18n(I18nKey.timeline),
 		url: "/timeline/",
-		icon: "material-symbols:timeline-rounded",
+		icon: "material-symbols:timeline",
 		pageKey: "timeline",
 	},
 	Albums: {
@@ -140,29 +140,11 @@ export const LinkPresets: Record<string, NavBarLink> = {
 const defaultNavBarConfig: NavBarConfig = {
 	links: [
 		LinkPresets.Home,
+		LinkPresets.Projects,
+		LinkPresets.Skills,
+		LinkPresets.Devices,
 		LinkPresets.Archive,
-		LinkPresets.Friends,
-		LinkPresets.Moments,
-		LinkPresets.Anime,
-		LinkPresets.Compass,
-		LinkPresets.Albums,
-		{
-			name: i18n(I18nKey.more),
-			icon: "material-symbols:apps-rounded",
-			children: [
-				LinkPresets.Timeline,
-				LinkPresets.Projects,
-				LinkPresets.Devices,
-				LinkPresets.Games,
-				LinkPresets.Skills,
-				// 分类/标签入口不进导航菜单（避免菜单项过多），预设已登记指向独立页面，
-				// 需要时取消注释即可
-				// LinkPresets.Categories,
-				// LinkPresets.Tags,
-				LinkPresets.About,
-				LinkPresets.GitHub,
-			],
-		},
+		LinkPresets.About,
 	],
 };
 

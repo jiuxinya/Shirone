@@ -121,7 +121,7 @@ $effect(() => {
 
 <Card color="var(--card-bg)" radius="l" class="projects-section px-8 py-6">
 	<PageHeader
-		icon="material-symbols:deployed-code-outline-rounded"
+		icon="material-symbols:terminal-rounded"
 		{title}
 		{subtitle}
 	/>

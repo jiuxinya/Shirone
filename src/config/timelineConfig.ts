@@ -30,7 +30,7 @@ export const timelineConfig: TimelineConfig = withUserConfig("timeline", {
 		{
 			key: "career",
 			label: "Career",
-			icon: "material-symbols:work-rounded",
+			icon: "material-symbols:work-outline",
 		},
 		{
 			key: "education",

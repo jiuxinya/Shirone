@@ -273,7 +273,7 @@ onMount(() => {
 				<Icon icon="material-symbols:tv-off-outline-rounded" aria-hidden="true" />
 				<span>{i18n(I18nKey.animeSyncEmpty)}</span>
 			{:else}
-				<Icon icon="material-symbols:search-off-outline-rounded" aria-hidden="true" />
+				<Icon icon="material-symbols:search-off" aria-hidden="true" />
 				<span>{i18n(I18nKey.animeNoResults)}</span>
 			{/if}
 		</div>

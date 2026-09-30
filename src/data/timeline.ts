@@ -41,7 +41,7 @@ export const timelineData: TimelineItem[] = [
 			"Reduced core bundle load times by 40% using modern SSR and asset pipelines",
 		],
 		tags: ["TypeScript", "Architecture", "Performance", "Design System"],
-		icon: "material-symbols:work-rounded",
+		icon: "material-symbols:work-outline",
 		featured: true,
 	},
 	{
@@ -56,7 +56,7 @@ export const timelineData: TimelineItem[] = [
 			"Built serverless backend APIs with edge caching and relational persistence",
 		],
 		tags: ["Svelte", "Node.js", "PostgreSQL", "Cloudflare"],
-		icon: "material-symbols:deployed-code-outline-rounded",
+		icon: "material-symbols:deployed-code",
 	},
 	{
 		title: "Computer Science & Engineering Degree",

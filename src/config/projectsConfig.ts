@@ -12,19 +12,30 @@ import { withUserConfig } from "../utils/config-overlay.ts";
  * 注：项目的具体内容数据（标题、描述、技术栈、链接、封面等）请在 `src/data/projects.ts` 中维护。
  */
 export const projectsConfig: ProjectsConfig = withUserConfig("projects", {
-	enable: false,
+	enable: true,
 	title: "$t:projects",
-	description: "$t:projectsBanner",
+	description:
+		"从零搭建并持续维护的工程实践，覆盖网络基建、自托管服务与安全加固。",
 	categories: [
 		{
-			key: "theme",
-			label: "Theme",
-			icon: "material-symbols:palette-outline-rounded",
+			key: "network",
+			label: "网络与基础设施",
+			icon: "material-symbols:lan-rounded",
 		},
 		{
-			key: "android",
-			label: "Android",
-			icon: "material-symbols:android-rounded",
+			key: "selfhosted",
+			label: "自托管与运维",
+			icon: "material-symbols:home-storage-rounded",
+		},
+		{
+			key: "content",
+			label: "内容与工具链",
+			icon: "material-symbols:article-outline-rounded",
+		},
+		{
+			key: "security",
+			label: "安全与加固",
+			icon: "material-symbols:shield-lock-outline-rounded",
 		},
 	],
 	// disabledKeys: [],

@@ -64,7 +64,7 @@ export const compassData: CompassShelf[] = [
 	{
 		key: "design",
 		name: "Design",
-		icon: "material-symbols:palette-outline-rounded",
+		icon: "material-symbols:palette-outline",
 		blurb: "Colors, icons and inspiration",
 		entries: [
 			{

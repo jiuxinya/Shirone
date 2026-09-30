@@ -43,7 +43,7 @@ const filteredItems = $derived(
 
 <Card color="var(--card-bg)" radius="l" class="skills-section px-8 py-6">
 	<PageHeader
-		icon="material-symbols:workspaces-outline-rounded"
+		icon="material-symbols:settings-suggest-rounded"
 		{title}
 		{subtitle}
 	/>

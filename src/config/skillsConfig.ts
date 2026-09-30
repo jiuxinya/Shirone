@@ -12,23 +12,29 @@ import { withUserConfig } from "../utils/config-overlay.ts";
  * 注：技能的具体内容数据（技能名称、熟练度等级、图标、描述等）请在 `src/data/skills.ts` 中维护。
  */
 export const skillsConfig: SkillsConfig = withUserConfig("skills", {
-	enable: false,
+	enable: true,
 	title: "$t:skills",
-	description: "$t:skillsBanner",
+	description:
+		"真实运行环境中使用过的技术与工具，等级按可支撑的项目与文章评定。",
 	categories: [
 		{
-			key: "frontend",
-			label: "Frontend",
-			icon: "material-symbols:web-rounded",
+			key: "systems",
+			label: "系统与网络",
+			icon: "material-symbols:router-outline-rounded",
 		},
 		{
-			key: "backend",
-			label: "Backend",
-			icon: "material-symbols:dns-rounded",
+			key: "ops",
+			label: "运维与自动化",
+			icon: "material-symbols:build-rounded",
+		},
+		{
+			key: "dev",
+			label: "开发与脚本",
+			icon: "material-symbols:code-rounded",
 		},
 		{
 			key: "tooling",
-			label: "Tooling",
+			label: "工具链",
 			icon: "material-symbols:construction-rounded",
 		},
 	],
