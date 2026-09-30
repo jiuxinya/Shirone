@@ -2,6 +2,19 @@
 
 @import "./markdown/disclosures.css";
 
+/* 深色模式下文章图片降亮（对齐桌面端 Obsidian 的 `lowlightness-darkmode` 片段）：
+   不透明度 .85，悬停回到 1。只作用于文章内容图与封面，不波及头像与 UI 图标。 */
+:root.dark .custom-md img,
+:root.dark #post-cover img {
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+
+:root.dark .custom-md img:hover,
+:root.dark #post-cover img:hover {
+  opacity: 1;
+}
+
 .custom-md {
   h1 {
     @apply text-3xl;

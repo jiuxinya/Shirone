@@ -93,7 +93,7 @@ Marker 使用 `==内容==` 为正文中的短语提供原生 `<mark>` 高亮；�
 ==需要修正的条件=={.error}
 ```
 
-`remark-marker.mjs` 只在代码围栏和行内代码之外将作者语法改写为 text directive，再由 `rehype-component-marker.mjs` 输出带稳定 class 的语义化 `<mark>`。未知变体、空内容、未闭合语法和转义文本保留原文，避免不完整的文章内容被静默改写。样式位于 `markdown/marker.css`，只使用 M3E 语义色 token，不依赖客户端模块、动画或网络请求。独立演示页位于 `src/content/posts/marker-highlights.md`。
+`remark-marker.mjs` 只在代码围栏和行内代码之外将作者语法改写为 text directive，再由 `rehype-component-marker.mjs` 输出带稳定 class 的语义化 `<mark>`。未知变体、空内容、未闭合语法和转义文本保留原文，避免不完整的文章内容被静默改写。样式位于 `markdown/marker.css`，不依赖客户端模块、动画或网络请求。默认变体沿用桌面端 Obsidian 的固定高亮黄（`rgba(255, 208, 0, 0.3)`，配 3px 圆角与 1px/4px 内边距），属于有据可查的内容特定例外；其余变体继续用 M3E 语义色 token 派生填充。独立演示页位于 `src/content/posts/marker-highlights.md`。
 
 ### 3.3 缩写词
 

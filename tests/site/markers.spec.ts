@@ -15,7 +15,7 @@ async function openPost(page: import("@playwright/test").Page) {
 }
 
 test.describe("Markdown marker highlights", () => {
-	test("renders semantic native marks with token-driven colors", async ({
+	test("renders native marks with the Obsidian highlight fill", async ({
 		page,
 	}) => {
 		const markers = await openPost(page);
@@ -46,11 +46,16 @@ test.describe("Markdown marker highlights", () => {
 				};
 			}),
 		);
-		for (const marker of geometry) {
-			expect(marker.background).toBe("rgba(0, 0, 0, 0)");
-			expect(marker.borderRadius).toBeGreaterThan(0);
-			expect(marker.boxShadow).not.toBe("none");
+		// 默认变体沿用 Obsidian `==高亮==` 的固定黄底块（`better-hight` 片段），
+		// 其余变体继续用 M3E 语义色填充；全部为实心底色而非 inset 下划线。
+		for (const [index, marker] of geometry.entries()) {
+			expect(marker.background).not.toBe("rgba(0, 0, 0, 0)");
+			expect(marker.borderRadius).toBe(3);
+			expect(marker.boxShadow).toBe("none");
 			expect(marker.fontWeight).not.toBe("600");
+			if (index < 3) {
+				expect(marker.background).toBe("rgba(255, 208, 0, 0.3)");
+			}
 		}
 
 		const results = await new AxeBuilder({ page })

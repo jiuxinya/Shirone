@@ -16,3 +16,52 @@
   > :is(h1, h2, h3):first-child:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   margin-top: 0;
 }
+
+/* ── 标题分级色 ──
+   对齐桌面端 Obsidian 的 `different-titlecolor` 片段：变量名与片段一致，改色只需
+   动这一处。暗色模式沿用片段原值（One Dark 系，深色底上 h1–h6 实测 4.5–8.4:1）；
+   浅色模式改用同色相压暗的变体，保证亮底上同样满足 WCAG AA 4.5:1（原值在浅色底
+   上只有 1.65–3.06:1）。
+   本规则必须留在 utilities 层：Typography 的 `--tw-prose-headings` 同层声明，
+   放到 components 层会被它整体压掉。 */
+.custom-md {
+  --h1-color: #d32e3a;
+  --h2-color: #9b632f;
+  --h3-color: #91681d;
+  --h4-color: #537a37;
+  --h5-color: #1372c0;
+  --h6-color: #ac39cd;
+}
+
+:root.dark .custom-md {
+  --h1-color: #e06c75;
+  --h2-color: #d19a66;
+  --h3-color: #e5c07b;
+  --h4-color: #98c379;
+  --h5-color: #61afef;
+  --h6-color: #c678dd;
+}
+
+.custom-md h1:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--h1-color);
+}
+
+.custom-md h2:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--h2-color);
+}
+
+.custom-md h3:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--h3-color);
+}
+
+.custom-md h4:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--h4-color);
+}
+
+.custom-md h5:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--h5-color);
+}
+
+.custom-md h6:not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--h6-color);
+}
