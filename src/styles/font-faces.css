@@ -2,12 +2,35 @@
 :root {
     --font-body-fallback: ui-sans-serif, system-ui, sans-serif;
     --font-cjk-fallback: system-ui, sans-serif;
+    --font-ui-fallback: system-ui, "Segoe UI", "Noto Sans SC", sans-serif;
     --m3e-font-mono-fallback: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --m3e-font-sans: var(--font-body), var(--font-cjk), var(--font-body-fallback), "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+    /* `--font-cjk` 只在 fontConfig 配置了 cjk 角色时才存在。未配置时（本站正文字体
+       已覆盖汉字）不能让它整条 font-family 声明失效，因此这里带默认值取正文字体栈。 */
+    --m3e-font-sans: var(--font-body), var(--font-cjk, var(--font-body-fallback)), var(--font-body-fallback), "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
     --font-sans: var(--m3e-font-sans);
     /* Astro Fonts owns --font-mono when a custom mono role is enabled. Keep a
        one-way alias here so the system-font fallback cannot form a cycle. */
     --m3e-font-mono-family: var(--font-mono, var(--m3e-font-mono-fallback));
+    /* Astro Fonts 同样拥有 --font-ui（界面角色）；这里只给别名与系统回退链。 */
+    --m3e-font-ui: var(--font-ui, var(--font-ui-fallback));
+}
+
+/* 界面角色：顶栏、导航抽屉、侧栏、类别栏、浮动控件、浮层面板与表单控件统一走
+   `--m3e-font-ui`（对应桌面端 Obsidian 的 interfaceFontFamily 语义）。
+   正文与文章内容不在此列，仍由 `--m3e-font-sans` 决定。 */
+#navbar,
+.site-drawer,
+#category-bar-region,
+#floating-controls,
+aside#sidebar,
+aside#sidebar-secondary,
+.footer,
+.float-panel,
+button,
+input,
+select,
+textarea {
+    font-family: var(--m3e-font-ui);
 }
 
 /* Code is a separate role and must never inherit the body or CJK family. */

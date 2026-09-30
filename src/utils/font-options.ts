@@ -12,6 +12,7 @@ const ROLE_VARIABLES: Record<FontRole, ResolvedFontRole["cssVariable"]> = {
 	body: "--font-body",
 	cjk: "--font-cjk",
 	mono: "--font-mono",
+	ui: "--font-ui",
 };
 
 /** 系统回退字体栈 */
@@ -19,6 +20,7 @@ const SYSTEM_FALLBACKS: Record<FontRole, string> = {
 	body: "ui-sans-serif, system-ui, sans-serif",
 	cjk: "system-ui, sans-serif",
 	mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+	ui: 'system-ui, -apple-system, "Segoe UI", "Noto Sans SC", sans-serif',
 };
 
 // 格式校验正则表达式
@@ -118,8 +120,8 @@ function validateFamily(definition: FontFamilyDefinition, index: number): void {
 		fail(`${path}.id`, "must be a stable kebab-case identifier");
 	if (!FAMILY_NAME.test(definition.family))
 		fail(`${path}.family`, "contains unsupported CSS family characters");
-	if (!["body", "cjk", "mono"].includes(definition.role))
-		fail(`${path}.role`, "must be body, cjk, or mono");
+	if (!["body", "cjk", "mono", "ui"].includes(definition.role))
+		fail(`${path}.role`, "must be body, cjk, mono, or ui");
 	if (!["local", "fontsource"].includes(definition.source))
 		fail(`${path}.source`, "must be local or fontsource");
 	if (definition.variants.length === 0)
@@ -176,6 +178,7 @@ export function resolveFontOptions(config: FontConfig): ResolvedFontOptions {
 		body: emptyRole("body"),
 		cjk: emptyRole("cjk"),
 		mono: emptyRole("mono"),
+		ui: emptyRole("ui"),
 	};
 	const seenRoles = new Set<FontRole>();
 
@@ -238,6 +241,10 @@ export function createFontRoleStyle(options: ResolvedFontOptions): string {
 		.map((role) => {
 			const resolved = options.roles[role];
 			if (!resolved.family) return "";
+			// `ui` 与 `mono` 的变量由 Astro Fonts 拥有（local 模式下是带哈希的族名），
+			// 主题不再用未哈希族名重复声明同名变量：别名与回退链见
+			// `src/styles/font-faces.css` 的 `--m3e-font-ui` / `--m3e-font-mono-family`。
+			if (role === "ui") return "";
 			return `\t--${role === "mono" ? "m3e-font-mono-family" : `font-${role}`}: ${quoteFontFamily(resolved.family)};`;
 		})
 		.filter(Boolean)

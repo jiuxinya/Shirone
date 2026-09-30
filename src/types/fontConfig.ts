@@ -10,8 +10,9 @@ export type FontMode = "system" | "custom";
  * - `"body"`：正文字体（主要用于西文、数字及默认文本，对应 CSS 变量 `--font-body`）。
  * - `"cjk"`：中日韩文本字体（用于汉字、假名等 CJK 字符展示，对应 CSS 变量 `--font-cjk`）。
  * - `"mono"`：等宽代码字体（用于代码块、行内代码、终端、图表标签，对应 CSS 变量 `--font-mono` / `--m3e-font-mono-family`）。
+ * - `"ui"`：界面字体（顶栏、侧栏、类别栏、浮动控件、按钮与表单控件等 UI 文字，对应 CSS 变量 `--font-ui` / `--m3e-font-ui`）。
  */
-export type FontRole = "body" | "cjk" | "mono";
+export type FontRole = "body" | "cjk" | "mono" | "ui";
 
 /**
  * 字体资源来源：
@@ -68,7 +69,7 @@ export interface FontFamilyDefinition {
 	 * 真实的 CSS `font-family` 名称（如 "Roboto"、"Zen Maru Gothic"、"JetBrains Mono Variable"）。
 	 */
 	family: string;
-	/** 绑定的角色："body" | "cjk" | "mono"，每个角色最多定义一个字体族 */
+	/** 绑定的角色："body" | "cjk" | "mono" | "ui"，每个角色最多定义一个字体族 */
 	role: FontRole;
 	/** 字体来源："local"（本地 .woff2）或 "fontsource"（npm 包） */
 	source: FontSource;
@@ -138,8 +139,8 @@ export interface ResolvedFontVariant extends FontVariant {
 
 /** 已经过校验并完成角色变量绑定的字体角色 */
 export interface ResolvedFontRole {
-	/** 绑定的 CSS 变量名（--font-body / --font-cjk / --font-mono） */
-	cssVariable: "--font-body" | "--font-cjk" | "--font-mono";
+	/** 绑定的 CSS 变量名（--font-body / --font-cjk / --font-mono / --font-ui） */
+	cssVariable: "--font-body" | "--font-cjk" | "--font-mono" | "--font-ui";
 	/** 字体 family 名称，若未配置则为空字符串 */
 	family: string;
 	/** 格式化后的回退字体链 CSS 字符串 */

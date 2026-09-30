@@ -7,10 +7,29 @@ import { resolveFontOptions as resolve } from "../utils/font-options.ts";
  *  Shirone 全站字体配置指南
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * 博客的字体分为 3 种角色（Role），每个角色各司其职：
+ * 博客的字体分为 4 种角色（Role），每个角色各司其职：
  *  1. `body`：西文与默认基础正文字体（英文字母、数字、基础标点）
  *  2. `cjk` ：中日韩字体（汉字、日文平假名/片假名、韩文）
  *  3. `mono`：等宽代码字体（文章代码块、行内代码、终端输出）
+ *  4. `ui`  ：界面字体（顶栏、侧栏、类别栏、浮动控件、按钮与表单控件）
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 【本站取值】对齐桌面端 Obsidian 的外观配置（只看字体栈部分）
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  - 正文 `body`   = 霞鹜文楷 LXGW WenKai（Light/Regular/Medium 里的 400 + 500）
+ *  - 代码 `mono`   = JetBrains Mono
+ *  - 界面 `ui`     = MiSans
+ *  - 中文 `cjk`    = 留空，理由见下
+ *
+ * Obsidian 的 `textFontFamily` 是**单一字体通吃全部正文字符**（西文与汉字同源），
+ * 所以这里也把 `body` 直接指向文楷，而不是"西文一种、汉字另一种"的两段栈。
+ * `cjk` 角色因此留空：正文已由文楷覆盖全部汉字，再声明一个 cjk 字体族只会让同
+ * 一份字形在产物里被打包两次——Astro Fonts 按角色的 `cssVariable` 生成文件 URL，
+ * 同一个物理文件挂到两个角色下会得到两个不同 URL。将来若要中英分家（如中文换
+ * 更纱黑体），补一个 `role: "cjk"` 条目即可，`--m3e-font-sans` 的回退链已经就位。
+ *
+ * 字重说明：霞鹜文楷官方只有 Light/Regular/Medium，**没有 Bold**，汉字加粗由
+ * 浏览器合成；Medium(500) 让"取真字重"成为可能，与 Obsidian 侧的表现一致。
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * 【常见修改场景】
@@ -18,15 +37,15 @@ import { resolveFontOptions as resolve } from "../utils/font-options.ts";
  * 场景 A：完全使用系统默认字体（零字体打包，极速加载，最省流量）
  *   - 将 `mode` 设置为 `"system"`，并将 `fontFamilies` 设为空数组 `[]`。
  *
- * 场景 B：更换本地中文字体或英文字体（.woff2 文件）
- *   1. 准备你的 `.woff2` 字体文件，放入项目 `src/assets/fonts/` 目录下；
+ * 场景 B：更换本地中文字体或英文字体
+ *   1. 准备你的字体文件（`.ttf`/`.otf`/`.woff2`），放入项目 `src/assets/fonts/`；
  *   2. 找到对应角色的配置（如 `role: "cjk"` 或 `role: "body"`）；
- *   3. 设置 `source: "local"`，并在 `file` 中填入你的字体路径（例如 `"src/assets/fonts/MyFont.woff2"`）；
+ *   3. 设置 `source: "local"`，`file` 填字体路径；
  *   4. 将 `family` 设为该字体的真实族名称。
  *
  * 场景 C：使用 npm 的 Fontsource 字体包
  *   1. 安装字体包（如 `pnpm.cmd add @fontsource/inter`）；
- *   2. 设置 `source: "fontsource"`，并在 `file` 中填入对应的 CSS 路径（如 `"@fontsource/inter/400.css"`）；
+ *   2. 设置 `source: "fontsource"`，`file` 填对应 CSS 路径（如 `"@fontsource/inter/400.css"`）；
  *   3. 将 `family` 设为对应的字体名称（如 `"Inter"`）。
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -46,31 +65,27 @@ export const fontConfig: FontConfig = withUserConfig("font", {
 	mode: "custom",
 
 	/**
-	 * 字体清单列表（按需配置 body、cjk、mono 角色）
+	 * 字体清单列表（按需配置 body、cjk、mono、ui 角色）
 	 */
 	fontFamilies: [
 		// ---------------------------------------------------------------------
-		// 1. 正文字体（现代几何圆润西文字体 Outfit，与 M3E 大圆角及悠哉圆体绝配）
+		// 1. 正文字体：霞鹜文楷 LXGW WenKai（西文 + 汉字同源）
+		//    构建期按站点字符集子集化，生产站点只交付裁剪后的 WOFF2。
 		// ---------------------------------------------------------------------
 		{
-			id: "outfit-body",
-			family: "Outfit",
+			id: "lxgw-wenkai-body",
+			family: "LXGW WenKai",
 			role: "body",
-			source: "fontsource",
+			source: "local",
 			variants: [
 				{
-					file: "@fontsource/outfit/400.css",
+					file: "src/assets/fonts/LXGWWenKai-Regular.ttf",
 					weight: 400,
 					style: "normal",
 				},
 				{
-					file: "@fontsource/outfit/500.css",
+					file: "src/assets/fonts/LXGWWenKai-Medium.ttf",
 					weight: 500,
-					style: "normal",
-				},
-				{
-					file: "@fontsource/outfit/700.css",
-					weight: 700,
 					style: "normal",
 				},
 			],
@@ -80,27 +95,7 @@ export const fontConfig: FontConfig = withUserConfig("font", {
 		},
 
 		// ---------------------------------------------------------------------
-		// 2. 中文 / 日文 CJK 字体（悠哉圆体 Yozai Medium，全量简繁中日韩 100% 覆盖）
-		// ---------------------------------------------------------------------
-		{
-			id: "yozai-cjk",
-			family: "Yozai Medium",
-			role: "cjk",
-			source: "local",
-			variants: [
-				{
-					file: "src/assets/fonts/Yozai-Medium.ttf",
-					weight: 500,
-					style: "normal",
-				},
-			],
-			fallback: ["system-ui", "sans-serif"],
-			display: "swap",
-			preload: false,
-		},
-
-		// ---------------------------------------------------------------------
-		// 3. 代码等宽字体（渲染代码块与终端文本，对应 CSS 变量 --font-mono）
+		// 2. 代码等宽字体（渲染代码块与终端文本，对应 CSS 变量 --font-mono）
 		// ---------------------------------------------------------------------
 		{
 			id: "jetbrains-mono",
@@ -127,6 +122,32 @@ export const fontConfig: FontConfig = withUserConfig("font", {
 				"Consolas",
 				"monospace",
 			],
+			display: "swap",
+			preload: false,
+		},
+
+		// ---------------------------------------------------------------------
+		// 3. 界面字体：MiSans（顶栏、侧栏、类别栏、按钮与表单控件等 UI 文字，
+		//    对应 CSS 变量 --font-ui / --m3e-font-ui）
+		// ---------------------------------------------------------------------
+		{
+			id: "misans-ui",
+			family: "MiSans",
+			role: "ui",
+			source: "local",
+			variants: [
+				{
+					file: "src/assets/fonts/MiSans-Regular.otf",
+					weight: 400,
+					style: "normal",
+				},
+				{
+					file: "src/assets/fonts/MiSans-Medium.otf",
+					weight: 500,
+					style: "normal",
+				},
+			],
+			fallback: ["system-ui", "Segoe UI", "Noto Sans SC", "sans-serif"],
 			display: "swap",
 			preload: false,
 		},

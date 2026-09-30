@@ -392,13 +392,15 @@ export async function buildFontDeclarations(
 	const { fontProviders } = await import("astro/config");
 	const declarations: unknown[] = [];
 
-	for (const role of ["body", "cjk", "mono"]) {
+	for (const role of ["body", "cjk", "mono", "ui"]) {
 		const resolvedRole = resolvedFontOptions.roles[role];
 		if (!resolvedRole?.family) continue;
 
-		// `body` and `cjk` compose one sans stack, so Astro's automatic fallback
-		// metrics must stay off to avoid double-declaring fallback families.
-		const isCompositeSans = role === "body" || role === "cjk";
+		// body、cjk 与 ui 各自持有完整的回退链（前者合成为一条 sans 栈，后者由
+		// `--m3e-font-ui` 显式给出），因此都必须关闭 Astro 的自动回退指标声明，
+		// 避免与主题自己的回退字体重复声明。mono 保持默认行为。
+		const isCompositeSans =
+			role === "body" || role === "cjk" || role === "ui";
 		const fallbackOpts = isCompositeSans
 			? { fallbacks: [], optimizedFallbacks: false }
 			: {};
